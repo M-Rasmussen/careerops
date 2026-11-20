@@ -1,0 +1,38 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+
+# Working data / backups / generated files
+backups/
+*.sql
+*.dump
+*.sqlite3
+*.xlsx
+*.xls
+
+# Editor, OS
+.DS_Store
+.vscode/
+.idea/
+
+# Graphify local output (adjust after installation)
+graphify-out/
