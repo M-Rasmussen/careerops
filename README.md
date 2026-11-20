@@ -2,7 +2,7 @@
 
 Local-first job-search tracking and future agentic automation, with a free static portfolio demo.
 
-**Status:** Phase 1. A Dockerized FastAPI and PostgreSQL 17 backend with a minimal jobs API. No frontend or AI features yet. See `docs/PROJECT_SPEC.md` for the roadmap.
+**Status:** Phase 2 (backend). A Dockerized FastAPI and PostgreSQL 17 backend with saved jobs, confirmed applications, and Excel export. No frontend or AI features yet. See `docs/PROJECT_SPEC.md` for the roadmap.
 
 ## Requirements
 
@@ -38,7 +38,7 @@ On startup the API container runs `alembic upgrade head` before serving, so migr
 | Back up | `./scripts/backup.sh` |
 | Restore | `./scripts/restore.sh backups/<file>.dump [target_db]` |
 
-## API (Phase 1)
+## API
 
 | Method | Path | Notes |
 |---|---|---|
@@ -47,13 +47,29 @@ On startup the API container runs `alembic upgrade head` before serving, so migr
 | GET | `/api/jobs` | Newest first; `limit` (1–200, default 50), `offset` |
 | GET | `/api/jobs/{id}` | 404 if not found, 422 if the ID isn't a UUID |
 
-A saved job is a lead, **not** a submitted application. Timestamps are UTC ISO-8601.
+| POST | `/api/applications` | Record a **confirmed** submission. Requires `job_id`, `applied_date`, and `"submission_confirmed": true`. Optional `status` (default `applied`), `follow_up_date`, `notes`. 201; 404 if the job doesn't exist; 409 if that job already has an application. |
+| GET | `/api/applications` | Newest `applied_date` first. Filters: `status`, `company` (case-insensitive substring), `applied_from`, `applied_to` (inclusive `YYYY-MM-DD`). `limit` (1–200, default 50), `offset`. Each item includes its `job`. |
+| GET | `/api/applications/{id}` | 404 if not found |
+| PATCH | `/api/applications/{id}` | Partial update of `status`, `applied_date`, `follow_up_date`, `notes`. `job_id` can't change. Send `null` to clear `follow_up_date`/`notes`. |
+| DELETE | `/api/applications/{id}` | 204. The saved job is kept. |
+| GET | `/api/applications/export.xlsx` | Excel download of all applications matching the same filters (no pagination). Columns: Company, Job Title, Application Date, Status, Posting URL, Follow-up Date, Notes. |
+
+A saved job is a lead, **not** a submitted application. Saving a job never creates an application. An application row exists only when you explicitly confirm the submission (`submission_confirmed: true`).
+
+Statuses: `applied`, `interviewing`, `offer`, `rejected`, `withdrawn`. Rules: `applied_date` can't be in the future (one day of slack for time zones), and `follow_up_date` can't be before `applied_date`. Both rules are also enforced by database CHECK constraints. Errors use FastAPI's standard `{"detail": ...}` body: 404 not found, 409 conflict, 422 validation.
+
+Timestamps are UTC ISO-8601; `applied_date`/`follow_up_date` are calendar dates (`YYYY-MM-DD`). Full interactive docs are at `/docs`.
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/jobs -H 'Content-Type: application/json' \
   -d '{"company":"Example Corp","title":"Backend Engineer","posting_url":"https://example.com/jobs/1"}'
 curl http://127.0.0.1:8000/api/jobs
+curl -X POST http://127.0.0.1:8000/api/applications -H 'Content-Type: application/json' \
+  -d '{"job_id":"<job id>","submission_confirmed":true,"applied_date":"2026-11-20"}'
+curl -o applications.xlsx 'http://127.0.0.1:8000/api/applications/export.xlsx?status=interviewing'
 ```
+
+Exported text cells are always written as plain text, so a value like `=1+1` in notes is never run as a spreadsheet formula.
 
 ## Persistence
 
@@ -89,7 +105,7 @@ Persistence is not a backup: a deleted volume or a corrupted database needs a se
 
 `./scripts/test.sh` runs pytest inside the running API container against a dedicated database, `careerops_test` (`TEST_POSTGRES_DB`). The suite creates that database if it is missing and migrates it with Alembic. Each test runs in a transaction that is rolled back. The suite refuses to run if the test DB name equals the dev DB name, so it never modifies development data.
 
-Coverage: health (OK and DB-down 503), job creation, validation failures (missing, blank, or too-long fields, bad URLs, unknown fields), get by ID, 404 and malformed IDs, newest-first listing, pagination bounds, DB persistence, and a check that the migrations match the SQLAlchemy models.
+Coverage: health (OK and DB-down 503); jobs (creation, validation, get/404, listing, pagination, persistence); applications (confirmed-submission requirement, status and date validation, 404/409, partial updates and null handling, delete keeping the job, status/company/date filters, pagination bounds, DB CHECK/FK constraints); Excel export (columns, values, filters, empty export, formula-injection safety); and a check that the migrations match the SQLAlchemy models.
 
 ## Layout
 
@@ -106,8 +122,8 @@ backend/
     db.py               # engine, session, Base
     models.py           # SQLAlchemy models
     schemas.py          # Pydantic schemas
-    services/jobs.py    # persistence logic
-    api/                # health and jobs routes
+    services/           # jobs, applications, excel export logic
+    api/                # health, jobs, applications routes
   tests/
 ```
 
