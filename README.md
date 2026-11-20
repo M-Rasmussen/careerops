@@ -57,6 +57,10 @@ On startup the API container runs `alembic upgrade head` before serving, so migr
 | PATCH | `/api/applications/{id}` | Partial update of `status`, `applied_date`, `follow_up_date`, `notes`. `job_id` can't change. Send `null` to clear `follow_up_date`/`notes`. |
 | DELETE | `/api/applications/{id}` | 204. The saved job is kept. |
 | GET | `/api/applications/export.xlsx` | Excel download of all applications matching the same filters (no pagination). Columns: Company, Job Title, Application Date, Status, Posting URL, Follow-up Date, Notes. |
+| GET | `/api/ai/status` | Whether an AI provider is configured (provider/model names only; never the key or URL) |
+| GET / PUT | `/api/profile` | Your resume/profile text (`null` until saved). `PUT {"resume_text": ...}` is the only way it changes. |
+| POST | `/api/matches` | `{"job_id", "job_description", "force": false}` runs the AI match agent. 201 new; 200 when an assessment for identical inputs is reused (no AI call); 503 no provider; 409 no profile; 429 daily limit; 502/504 agent or provider failure (the run is still recorded). |
+| GET | `/api/matches`, `/api/matches/{id}` | Previous assessments, newest first (optional `job_id`, `limit`, `offset`), each with its agent run trace |
 
 A saved job is a lead, **not** a submitted application. Saving a job never creates an application. An application row exists only when you explicitly confirm the submission (`submission_confirmed: true`).
 
@@ -74,6 +78,23 @@ curl -o applications.xlsx 'http://127.0.0.1:8000/api/applications/export.xlsx?st
 ```
 
 Exported text cells are always written as plain text, so a value like `=1+1` in notes is never run as a spreadsheet formula.
+
+## AI job matching (optional)
+
+Disabled by default; the tracker works without it. To enable, set in `.env` and run `./scripts/start.sh`:
+
+```bash
+AI_PROVIDER=openai                       # any OpenAI-compatible /chat/completions API
+AI_MODEL=<model name>
+AI_BASE_URL=https://api.openai.com/v1    # or http://ollama:11434/v1 for the bundled local Ollama (free, no key)
+AI_API_KEY=<key, if the provider needs one>
+```
+
+**Local model (no paid calls):** `docker compose --profile local-ai up -d ollama`, then `docker compose exec ollama ollama pull qwen3:4b-instruct-2507-q4_K_M` and set `AI_MODEL` to that tag. Models persist in the `careerops_ollama` volume; Ollama isn't published to the host and doesn't start without the profile. CPU inference is slow, so set `AI_TIMEOUT_SECONDS=300`. Smoke test with fictional data in an isolated `careerops_smoke` database: `docker compose exec api python -m scripts.smoke_ai`.
+
+Limits (also in `.env`): `AI_MAX_OUTPUT_TOKENS` (2000; sent as `AI_TOKEN_PARAM`, either `max_tokens` (default) or `max_completion_tokens` for newer OpenAI models), `AI_MAX_STEPS` (6 model calls per analysis), `AI_TIMEOUT_SECONDS` (60 per call), `AI_MAX_RUNS_PER_DAY` (20). Paid providers bill per token. Analysis runs only when you click **Analyze match**, and identical inputs reuse the earlier assessment.
+
+The agent is a small explicit loop (`backend/app/agent/`) with three allowlisted tools: `get_saved_job` (only the job being analyzed), `get_candidate_profile` (read-only), and `save_match_assessment` (Pydantic-validated; refused unless both inputs were read and every evidence quote appears verbatim in your resume). Each run is stored in `agent_runs` with status, tool calls, errors, and token usage. Resume text isn't logged there.
 
 ## Persistence
 

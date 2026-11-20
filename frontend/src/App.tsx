@@ -4,6 +4,7 @@ import { Layout } from "./components/Layout";
 import { ApplicationsPage } from "./pages/ApplicationsPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { JobsPage } from "./pages/JobsPage";
+import { MatchingPage } from "./pages/MatchingPage";
 import type { DataAdapter } from "./types";
 
 export function App({ adapter }: { adapter: DataAdapter }) {
@@ -15,6 +16,7 @@ export function App({ adapter }: { adapter: DataAdapter }) {
             <Route index element={<DashboardPage />} />
             <Route path="jobs" element={<JobsPage />} />
             <Route path="applications" element={<ApplicationsPage />} />
+            <Route path="matching" element={<MatchingPage />} />
             <Route path="*" element={<h1>Page not found</h1>} />
           </Route>
         </Routes>

@@ -59,6 +59,79 @@ export interface ApplicationFilters {
   applied_to?: string;
 }
 
+export interface CandidateProfile {
+  resume_text: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type OverallMatch = "strong" | "moderate" | "weak" | "insufficient_information";
+
+export interface Qualification {
+  requirement: string;
+  category: string;
+  evidence: string[];
+  note: string;
+}
+
+export interface Assessment {
+  overall_match: OverallMatch;
+  recommendation: string;
+  supported: Qualification[];
+  partial: Qualification[];
+  missing: Qualification[];
+  uncertainties: string[];
+}
+
+export interface ToolCallLog {
+  step: number;
+  tool: string;
+  ok: boolean;
+  error: string | null;
+}
+
+export interface AgentRun {
+  id: string;
+  kind: string;
+  status: "running" | "succeeded" | "failed";
+  provider: string;
+  model: string;
+  steps: number;
+  tool_calls: ToolCallLog[];
+  error_type: string | null;
+  error: string | null;
+  input_tokens: number | null;
+  output_tokens: number | null;
+  started_at: string;
+  finished_at: string | null;
+}
+
+export interface JobMatch {
+  id: string;
+  job_id: string;
+  overall_match: OverallMatch;
+  assessment: Assessment;
+  job_description: string;
+  created_at: string;
+  job: Job;
+  run: AgentRun;
+  reused: boolean;
+}
+
+export interface MatchRequest {
+  job_id: string;
+  job_description: string;
+  force: boolean;
+}
+
+export interface AIStatus {
+  configured: boolean;
+  provider: string | null;
+  model: string | null;
+  max_steps: number;
+  max_runs_per_day: number;
+}
+
 /** One data-access contract shared by the live API and the browser-only demo. */
 export interface DataAdapter {
   mode: "live" | "demo";
@@ -69,6 +142,13 @@ export interface DataAdapter {
   updateApplication(id: string, payload: ApplicationUpdate): Promise<Application>;
   deleteApplication(id: string): Promise<void>;
   exportApplications(filters: ApplicationFilters): Promise<{ blob: Blob; filename: string }>;
+  getAIStatus(): Promise<AIStatus>;
+  getProfile(): Promise<CandidateProfile | null>;
+  /** Explicit user save only; nothing else writes the profile. */
+  saveProfile(resumeText: string): Promise<CandidateProfile>;
+  /** Starts an AI analysis (may cost money in live mode); only call from a user action. */
+  requestMatch(payload: MatchRequest): Promise<JobMatch>;
+  listMatches(limit: number, offset: number): Promise<JobMatch[]>;
   /** Demo only: restore the seed data. */
   reset?(): void;
 }

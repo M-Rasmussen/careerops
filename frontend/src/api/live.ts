@@ -54,6 +54,11 @@ export const liveAdapter: DataAdapter = {
   deleteApplication: async (id) => {
     await request(`/api/applications/${encodeURIComponent(id)}`, { method: "DELETE" });
   },
+  getAIStatus: () => json("/api/ai/status"),
+  getProfile: () => json("/api/profile"),
+  saveProfile: (resume_text) => json("/api/profile", send("PUT", { resume_text })),
+  requestMatch: (payload) => json("/api/matches", send("POST", payload)),
+  listMatches: (limit, offset) => json(`/api/matches?limit=${limit}&offset=${offset}`),
   exportApplications: async (filters) => {
     const res = await request(`/api/applications/export.xlsx${query(filters)}`);
     const match = /filename="([^"]+)"/.exec(res.headers.get("Content-Disposition") ?? "");

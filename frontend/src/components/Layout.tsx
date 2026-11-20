@@ -19,6 +19,7 @@ export function Layout() {
           <NavLink to="/" end>Dashboard</NavLink>
           <NavLink to="/jobs">Saved jobs</NavLink>
           <NavLink to="/applications">Applications</NavLink>
+          <NavLink to="/matching">AI matching</NavLink>
         </nav>
         {data.mode === "demo" && (
           <button type="button" className="btn btn-small sidebar-reset" onClick={resetDemo}>Reset demo</button>

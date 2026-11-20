@@ -89,3 +89,114 @@ class ApplicationRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     job: JobRead
+
+
+# --- AI matching (Phase 4A) ---
+
+MAX_RESUME_CHARS = 50_000
+MAX_JOB_DESCRIPTION_CHARS = 30_000
+
+
+class ProfileUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    resume_text: Annotated[RequiredStr, Field(max_length=MAX_RESUME_CHARS)]
+
+
+class ProfileRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    resume_text: str
+    created_at: datetime
+    updated_at: datetime
+
+
+OverallMatch = Literal["strong", "moderate", "weak", "insufficient_information"]
+QualificationCategory = Literal[
+    "required_skill", "preferred_skill", "experience", "experience_level",
+    "education", "certification", "project", "other",
+]
+ShortText = Annotated[RequiredStr, Field(max_length=500)]
+
+
+class Qualification(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    requirement: ShortText
+    category: QualificationCategory
+    evidence: Annotated[list[ShortText], Field(max_length=5)] = Field(
+        default_factory=list, description="Verbatim quotes copied from the resume. Never paraphrase."
+    )
+    note: Annotated[OptionalStr, Field(max_length=1000)] = ""
+
+
+class Assessment(BaseModel):
+    """Arguments of the save_match_assessment tool, and the stored assessment body."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    overall_match: OverallMatch
+    recommendation: Annotated[RequiredStr, Field(max_length=3000)] = Field(
+        description="Explanation of the overall recommendation."
+    )
+    supported: Annotated[list[Qualification], Field(max_length=30)] = Field(
+        description="Requirements clearly supported by resume evidence (evidence required)."
+    )
+    partial: Annotated[list[Qualification], Field(max_length=30)] = Field(
+        description="Requirements only partly supported (evidence required)."
+    )
+    missing: Annotated[list[Qualification], Field(max_length=30)] = Field(
+        description="Requirements missing from or not verifiable in the resume."
+    )
+    uncertainties: Annotated[list[Annotated[RequiredStr, Field(max_length=1000)]], Field(max_length=15)] = Field(
+        default_factory=list, description="Insufficient or ambiguous information."
+    )
+
+
+class MatchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    job_id: uuid.UUID
+    job_description: Annotated[RequiredStr, Field(max_length=MAX_JOB_DESCRIPTION_CHARS)]
+    # Re-run the agent even if an assessment for identical inputs exists.
+    force: bool = False
+
+
+class AgentRunRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    kind: str
+    status: str
+    provider: str
+    model: str
+    steps: int
+    tool_calls: list[dict]
+    error_type: str | None
+    error: str | None
+    input_tokens: int | None
+    output_tokens: int | None
+    started_at: datetime
+    finished_at: datetime | None
+
+
+class JobMatchRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    job_id: uuid.UUID
+    overall_match: OverallMatch
+    assessment: Assessment
+    job_description: str
+    created_at: datetime
+    job: JobRead
+    run: AgentRunRead
+    reused: bool = False
+
+
+class AIStatus(BaseModel):
+    configured: bool
+    provider: str | None
+    model: str | None
+    max_steps: int
+    max_runs_per_day: int

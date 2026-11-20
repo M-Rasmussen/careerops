@@ -1,0 +1,232 @@
+{
+  "_note": "Entirely fictional AI-matching demo data: a fictional profile and recorded (not live) agent assessments. Evidence quotes appear verbatim in the profile, as the real agent requires.",
+  "profile": "Alex Rivera (fictional demo candidate)\nSoftware engineer with 4 years of Python experience building REST APIs.\n- Built FastAPI services backed by PostgreSQL for an internal analytics tool.\n- Wrote ETL jobs that loaded vendor CSV files into a reporting warehouse.\n- Containerized services with Docker and set up GitHub Actions CI.\n- Side project: a React and TypeScript habit-tracker app.\nEducation: B.S. Information Systems.",
+  "recorded_matches": [
+    {
+      "job": "j1",
+      "seeded_days_ago": 2,
+      "input_tokens": 2140,
+      "output_tokens": 610,
+      "tool_calls": [
+        {
+          "step": 1,
+          "tool": "get_saved_job",
+          "ok": true,
+          "error": null
+        },
+        {
+          "step": 2,
+          "tool": "get_candidate_profile",
+          "ok": true,
+          "error": null
+        },
+        {
+          "step": 3,
+          "tool": "save_match_assessment",
+          "ok": true,
+          "error": null
+        }
+      ],
+      "job_description": "Required: Python, FastAPI, PostgreSQL, 3+ years of backend experience. Preferred: AWS, experience with climate or geospatial data.",
+      "assessment": {
+        "overall_match": "strong",
+        "recommendation": "The profile directly covers every required skill with concrete examples and exceeds the experience requirement. Preferred cloud and domain experience are not shown, so mention any AWS or data-domain exposure if you have it.",
+        "supported": [
+          {
+            "requirement": "Python, 3+ years",
+            "category": "experience_level",
+            "evidence": [
+              "4 years of Python experience building REST APIs"
+            ],
+            "note": ""
+          },
+          {
+            "requirement": "FastAPI",
+            "category": "required_skill",
+            "evidence": [
+              "Built FastAPI services backed by PostgreSQL"
+            ],
+            "note": ""
+          },
+          {
+            "requirement": "PostgreSQL",
+            "category": "required_skill",
+            "evidence": [
+              "Built FastAPI services backed by PostgreSQL"
+            ],
+            "note": ""
+          }
+        ],
+        "partial": [],
+        "missing": [
+          {
+            "requirement": "AWS",
+            "category": "preferred_skill",
+            "evidence": [],
+            "note": "No cloud provider is mentioned."
+          },
+          {
+            "requirement": "Climate or geospatial data",
+            "category": "preferred_skill",
+            "evidence": [],
+            "note": "No domain experience is mentioned."
+          }
+        ],
+        "uncertainties": [
+          "Production scale and on-call responsibilities of the analytics tool are not described."
+        ]
+      }
+    },
+    {
+      "job": "j5",
+      "seeded_days_ago": null,
+      "input_tokens": 1980,
+      "output_tokens": 540,
+      "tool_calls": [
+        {
+          "step": 1,
+          "tool": "get_saved_job",
+          "ok": true,
+          "error": null
+        },
+        {
+          "step": 2,
+          "tool": "get_candidate_profile",
+          "ok": true,
+          "error": null
+        },
+        {
+          "step": 3,
+          "tool": "save_match_assessment",
+          "ok": false,
+          "error": "Assessment rejected: evidence 'Maintained Airflow DAGs' is not a verbatim quote from the resume"
+        },
+        {
+          "step": 4,
+          "tool": "save_match_assessment",
+          "ok": true,
+          "error": null
+        }
+      ],
+      "job_description": "Required: Python, ETL pipeline experience, SQL. Preferred: Apache Airflow, automated data-quality testing.",
+      "assessment": {
+        "overall_match": "moderate",
+        "recommendation": "Core Python and ETL requirements are supported. SQL is implied by PostgreSQL work but not stated directly, and neither preferred skill appears, so this is a reasonable but not standout fit.",
+        "supported": [
+          {
+            "requirement": "Python",
+            "category": "required_skill",
+            "evidence": [
+              "4 years of Python experience"
+            ],
+            "note": ""
+          },
+          {
+            "requirement": "ETL pipeline experience",
+            "category": "required_skill",
+            "evidence": [
+              "Wrote ETL jobs that loaded vendor CSV files into a reporting warehouse"
+            ],
+            "note": ""
+          }
+        ],
+        "partial": [
+          {
+            "requirement": "SQL",
+            "category": "required_skill",
+            "evidence": [
+              "backed by PostgreSQL"
+            ],
+            "note": "PostgreSQL use suggests SQL, but SQL skill is not stated explicitly."
+          }
+        ],
+        "missing": [
+          {
+            "requirement": "Apache Airflow",
+            "category": "preferred_skill",
+            "evidence": [],
+            "note": ""
+          },
+          {
+            "requirement": "Automated data-quality testing",
+            "category": "preferred_skill",
+            "evidence": [],
+            "note": ""
+          }
+        ],
+        "uncertainties": [
+          "Data volumes handled by the ETL jobs are not described."
+        ]
+      }
+    },
+    {
+      "job": "j7",
+      "seeded_days_ago": null,
+      "input_tokens": 2050,
+      "output_tokens": 480,
+      "tool_calls": [
+        {
+          "step": 1,
+          "tool": "get_saved_job",
+          "ok": true,
+          "error": null
+        },
+        {
+          "step": 2,
+          "tool": "get_candidate_profile",
+          "ok": true,
+          "error": null
+        },
+        {
+          "step": 3,
+          "tool": "save_match_assessment",
+          "ok": true,
+          "error": null
+        }
+      ],
+      "job_description": "Required: 3+ years of professional React and TypeScript, WCAG accessibility expertise, CSS architecture. Preferred: CMS experience.",
+      "assessment": {
+        "overall_match": "weak",
+        "recommendation": "React and TypeScript appear only in a side project, and the role requires several years of professional frontend work plus accessibility expertise that the profile does not show.",
+        "supported": [],
+        "partial": [
+          {
+            "requirement": "React and TypeScript",
+            "category": "required_skill",
+            "evidence": [
+              "Side project: a React and TypeScript habit-tracker app"
+            ],
+            "note": "Side project only; no professional frontend experience is stated."
+          }
+        ],
+        "missing": [
+          {
+            "requirement": "3+ years of professional frontend experience",
+            "category": "experience_level",
+            "evidence": [],
+            "note": ""
+          },
+          {
+            "requirement": "WCAG accessibility expertise",
+            "category": "required_skill",
+            "evidence": [],
+            "note": ""
+          },
+          {
+            "requirement": "CSS architecture",
+            "category": "required_skill",
+            "evidence": [],
+            "note": ""
+          },
+          {
+            "requirement": "CMS experience",
+            "category": "preferred_skill",
+            "evidence": [],
+            "note": ""
+          }
+        ],
+        "uncertainties": []
+      }
+    }
+  ]
+}

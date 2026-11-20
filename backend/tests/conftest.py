@@ -12,11 +12,11 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine, create_engine, text
+from sqlalchemy import Connection, Engine, create_engine, text
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.db import get_db
+from app.db import get_db, get_session_factory
 from app.main import app
 
 BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,22 +54,36 @@ def engine() -> Iterator[Engine]:
 
 
 @pytest.fixture
-def db_session(engine: Engine) -> Iterator[Session]:
-    connection = engine.connect()
-    transaction = connection.begin()
+def connection(engine: Engine) -> Iterator[Connection]:
+    """One connection per test whose outer transaction is always rolled back."""
+    conn = engine.connect()
+    transaction = conn.begin()
+    try:
+        yield conn
+    finally:
+        transaction.rollback()
+        conn.close()
+
+
+def _session(connection: Connection) -> Session:
     # Commits inside the app become savepoints; the outer transaction is rolled back.
-    session = Session(bind=connection, join_transaction_mode="create_savepoint", expire_on_commit=False)
+    return Session(bind=connection, join_transaction_mode="create_savepoint", expire_on_commit=False)
+
+
+@pytest.fixture
+def db_session(connection: Connection) -> Iterator[Session]:
+    session = _session(connection)
     try:
         yield session
     finally:
         session.close()
-        transaction.rollback()
-        connection.close()
 
 
 @pytest.fixture
-def client(db_session: Session) -> Iterator[TestClient]:
+def client(db_session: Session, connection: Connection) -> Iterator[TestClient]:
     app.dependency_overrides[get_db] = lambda: db_session
+    # Short-lived sessions (used around LLM calls) share the same rolled-back connection.
+    app.dependency_overrides[get_session_factory] = lambda: lambda: _session(connection)
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()

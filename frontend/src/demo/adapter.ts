@@ -1,13 +1,44 @@
 // Browser-only adapter for the public demo. It never calls the API or the real database; the only
-// network request is for its own static sample workbook.
-import type { Application, ApplicationFilters, DataAdapter, Job } from "../types";
+// network request is for its own static sample workbook. AI matching replays recorded, fictional
+// assessments: no AI provider is ever contacted.
+import type { Application, ApplicationFilters, Assessment, CandidateProfile, DataAdapter, Job, JobMatch, OverallMatch } from "../types";
 import { STATUSES } from "../types";
 import { addDays, today } from "../dates";
 import seed from "./seed.json";
+import matching from "./matching.json";
 
 const KEY = "careerops-demo-v1";
 type StoredApp = Omit<Application, "job">;
-interface State { jobs: Job[]; apps: StoredApp[] }
+type StoredMatch = Omit<JobMatch, "job">;
+interface State { jobs: Job[]; apps: StoredApp[]; profile: CandidateProfile; matches: StoredMatch[] }
+type Recorded = (typeof matching.recorded_matches)[number];
+
+const seedJob = (r: Recorded) => seed.jobs.find((j) => j.key === r.job)!;
+// Demo jobs get fresh IDs per seed, so recorded analyses are matched by company + title.
+const recordedFor = (job: Job) =>
+  matching.recorded_matches.find((r) => seedJob(r).company === job.company && seedJob(r).title === job.title);
+
+function replay(r: Recorded, jobId: string, at: string): StoredMatch {
+  return {
+    id: crypto.randomUUID(), job_id: jobId, overall_match: r.assessment.overall_match as OverallMatch,
+    assessment: r.assessment as Assessment, job_description: r.job_description, created_at: at, reused: false,
+    run: {
+      id: crypto.randomUUID(), kind: "job_match", status: "succeeded", provider: "demo", model: "recorded-trace",
+      steps: Math.max(...r.tool_calls.map((c) => c.step)), tool_calls: r.tool_calls, error_type: null, error: null,
+      input_tokens: r.input_tokens, output_tokens: r.output_tokens, started_at: at, finished_at: at,
+    },
+  };
+}
+
+/** Adds AI-matching seed data; also upgrades demo state saved before AI matching existed. */
+function withMatching(s: Omit<State, "profile" | "matches"> & Partial<State>): State {
+  const at = `${today()}T12:00:00Z`;
+  const matches = matching.recorded_matches.flatMap((r) => {
+    const job = s.jobs.find((j) => recordedFor(j) === r);
+    return job && r.seeded_days_ago !== null ? [replay(r, job.id, `${addDays(today(), -r.seeded_days_ago)}T12:00:00Z`)] : [];
+  });
+  return { profile: { resume_text: matching.profile, created_at: at, updated_at: at }, matches, ...s };
+}
 
 function seedState(): State {
   const now = today();
@@ -32,13 +63,13 @@ function seedState(): State {
       updated_at: `${applied}T12:00:00Z`,
     };
   });
-  return { jobs, apps };
+  return withMatching({ jobs, apps });
 }
 
 function load(): State {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw) as State;
+    if (raw) return withMatching(JSON.parse(raw) as State);
   } catch {
     // Unavailable or corrupt storage: fall back to fresh seed data.
   }
@@ -137,6 +168,41 @@ export function createDemoAdapter(sampleWorkbookUrl = "/demo/sample-applications
       getApp(id);
       state = { ...state, apps: state.apps.filter((a) => a.id !== id) };
       commit();
+    },
+    async getAIStatus() {
+      return { configured: true, provider: "demo", model: "recorded-trace", max_steps: 6, max_runs_per_day: 20 };
+    },
+    async getProfile() {
+      return state.profile;
+    },
+    async saveProfile(text) {
+      const resume_text = text.trim();
+      if (!resume_text) throw new Error("resume_text: String should have at least 1 character");
+      state = { ...state, profile: { ...state.profile, resume_text, updated_at: nowIso() } };
+      commit();
+      return state.profile;
+    },
+    async requestMatch(p) {
+      const job = state.jobs.find((j) => j.id === p.job_id);
+      if (!job) throw new Error("Job not found");
+      if (!p.job_description.trim()) throw new Error("job_description: String should have at least 1 character");
+      const recorded = recordedFor(job);
+      if (!recorded) {
+        const names = matching.recorded_matches.map((r) => seedJob(r).company).join(", ");
+        throw new Error(`Demo mode only has recorded analyses for ${names}. The private app runs the real agent on any saved job.`);
+      }
+      const existing = state.matches.find((m) => m.job_id === job.id);
+      if (existing && !p.force) return { ...existing, reused: true, job };
+      const match = replay(recorded, job.id, nowIso());
+      state = { ...state, matches: [...state.matches, match] };
+      commit();
+      return { ...match, job };
+    },
+    async listMatches(limit, offset) {
+      return [...state.matches]
+        .sort((a, b) => b.created_at.localeCompare(a.created_at))
+        .slice(offset, offset + limit)
+        .map((m) => ({ ...m, job: state.jobs.find((j) => j.id === m.job_id)! }));
     },
     async exportApplications() {
       // shortcut: static pre-generated workbook (ignores filters and demo edits); generate in-browser if it matters.

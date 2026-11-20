@@ -136,6 +136,18 @@ td.notes { max-width: 260px; color: var(--muted); }
 tr.editing td, tr.editing:hover td { background: var(--surface-alt); }
 .pager { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.25rem; color: var(--muted); font-size: 0.875rem; }
 
+/* AI matching */
+.notice { background: #f0f4ff; border: 1px solid #c9d6fb; border-radius: 7px; padding: 0.7rem 0.9rem; margin-bottom: 1.25rem; font-size: 0.9rem; }
+label.inline-check { flex-direction: row; align-items: center; gap: 0.5rem; font-weight: 500; }
+.assessment h3, .qual h3 { font-size: 0.9rem; font-weight: 600; margin: 1.1rem 0 0.4rem; }
+.assessment ul, .assessment ol { margin: 0; padding-left: 1.25rem; }
+.qual li { margin-bottom: 0.6rem; }
+.qual blockquote { margin: 0.25rem 0 0; padding-left: 0.6rem; border-left: 3px solid var(--border-strong); color: var(--muted); font-size: 0.875rem; }
+.assessment details { margin-top: 1.25rem; font-size: 0.875rem; }
+.assessment summary { cursor: pointer; font-weight: 500; }
+.assessment .trace { margin-top: 0.5rem; }
+.danger-text { color: var(--danger); }
+
 /* Tablet: headline tiles side by side, status breakdown below */
 @media (max-width: 1080px) {
   .kpis { grid-template-columns: 1fr 1fr; }
