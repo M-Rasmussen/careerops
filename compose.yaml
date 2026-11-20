@@ -41,6 +41,24 @@ services:
       retries: 5
       start_period: 15s
 
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    environment:
+      # vite preview proxies /api here; the browser only ever talks to the web origin.
+      API_PROXY_TARGET: http://api:8000
+    ports:
+      - "127.0.0.1:${WEB_PORT:-5173}:5173"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:5173/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 volumes:
   pgdata:
     name: careerops_pgdata

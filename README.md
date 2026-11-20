@@ -20,6 +20,7 @@ cp .env.example .env        # then edit POSTGRES_PASSWORD
 
 `scripts/start.sh` wraps `docker compose up -d --build --wait`, and that command works on its own too. You can run the scripts from any directory.
 
+- Dashboard: http://127.0.0.1:5173 (React; change `WEB_PORT` in `.env`). It proxies `/api` to the API service.
 - API: http://127.0.0.1:8000 (bound to localhost only; change `API_PORT` in `.env` if 8000 is taken)
 - Interactive docs: http://127.0.0.1:8000/docs
 - Health: http://127.0.0.1:8000/health → `{"status":"ok","database":"ok"}` (503 if the DB is unreachable)
@@ -33,6 +34,9 @@ On startup the API container runs `alembic upgrade head` before serving, so migr
 | Start / rebuild | `./scripts/start.sh` |
 | Stop (keeps data) | `./scripts/stop.sh` (runs `docker compose stop`) |
 | Run tests | `./scripts/test.sh` (extra args go to pytest, e.g. `-v`) |
+| Frontend tests | `cd frontend && npm ci && npm test` |
+| Frontend dev server (hot reload) | `cd frontend && npm run dev` (proxies to `API_PROXY_TARGET`, default `http://127.0.0.1:8001`) |
+| Demo build (static, no backend) | `cd frontend && npm run build:demo` → `frontend/dist-demo/` |
 | Logs | `docker compose logs -f api` |
 | DB shell | `docker compose exec db psql -U careerops -d careerops` |
 | Back up | `./scripts/backup.sh` |
@@ -107,10 +111,14 @@ Persistence is not a backup: a deleted volume or a corrupted database needs a se
 
 Coverage: health (OK and DB-down 503); jobs (creation, validation, get/404, listing, pagination, persistence); applications (confirmed-submission requirement, status and date validation, 404/409, partial updates and null handling, delete keeping the job, status/company/date filters, pagination bounds, DB CHECK/FK constraints); Excel export (columns, values, filters, empty export, formula-injection safety); and a check that the migrations match the SQLAlchemy models.
 
+## Demo mode
+
+`npm run build:demo` builds the same React app with `VITE_DEMO_MODE=true`. In that build, a browser-only adapter (`frontend/src/demo/`) replaces the API client. The demo uses fictional seed data, saves changes to localStorage, labels every page as a demo, and has a Reset demo button. It makes no API calls (the live client is left out of the bundle). Its Excel download is a pre-generated sample workbook (`frontend/public/demo/sample-applications.xlsx`) produced by the backend exporter from the seed. `frontend/scripts/demo_workbook.py` regenerates it. The output is a static site for Cloudflare Pages or similar hosting. Deployment is not set up yet.
+
 ## Layout
 
 ```
-compose.yaml            # db (postgres:17 + named volume) and api
+compose.yaml            # db (postgres:17 + named volume), api, web
 .env.example            # copy to .env; .env is git-ignored
 scripts/                # start, stop, test, backup, restore
 backend/
@@ -125,6 +133,13 @@ backend/
     services/           # jobs, applications, excel export logic
     api/                # health, jobs, applications routes
   tests/
+frontend/
+  Dockerfile            # build, then `vite preview` with /api proxy
+  src/types.ts          # API types + DataAdapter interface
+  src/api/              # live adapter (fetch), paging helper, context
+  src/demo/             # fictional seed + localStorage demo adapter
+  src/pages/            # Dashboard, Saved jobs, Applications
+  src/test/             # Vitest + Testing Library
 ```
 
 ## Design rules

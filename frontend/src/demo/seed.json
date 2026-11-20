@@ -1,0 +1,24 @@
+{
+  "_note": "Entirely fictional demo data. Dates are day offsets from today so the demo never goes stale.",
+  "jobs": [
+    { "key": "j1", "company": "Lumen Harbor Labs", "title": "Backend Engineer (Python)", "location": "Remote (US)", "posting_url": "https://example.com/jobs/lumen-harbor-backend", "description": "Build FastAPI services for a fictional climate-data platform.", "notes": "Referral from a former teammate.", "created_days_ago": 30 },
+    { "key": "j2", "company": "Brightpath Logistics", "title": "Full-Stack Developer", "location": "Denver, CO", "posting_url": "https://example.com/jobs/brightpath-fullstack", "description": "React + PostgreSQL dashboards for fleet routing.", "notes": null, "created_days_ago": 27 },
+    { "key": "j3", "company": "Cedarline Health", "title": "Data Engineer", "location": "Hybrid - Austin, TX", "posting_url": "https://example.com/jobs/cedarline-data", "description": "Batch and streaming pipelines for anonymized clinical metrics.", "notes": "Strong benefits.", "created_days_ago": 24 },
+    { "key": "j4", "company": "Tidewater Robotics", "title": "Software Engineer, Platform", "location": "Remote", "posting_url": "https://example.com/jobs/tidewater-platform", "description": "Internal developer platform, Docker and CI tooling.", "notes": null, "created_days_ago": 21 },
+    { "key": "j5", "company": "Kestrel Data Co.", "title": "Python Developer", "location": "Chicago, IL", "posting_url": "https://example.com/jobs/kestrel-python", "description": "ETL tooling and internal APIs.", "notes": null, "created_days_ago": 18 },
+    { "key": "j6", "company": "Fernway Systems", "title": "DevOps Engineer", "location": "Remote (US/Canada)", "posting_url": "https://example.com/jobs/fernway-devops", "description": "Kubernetes, observability, and incident response.", "notes": "Salary range listed.", "created_days_ago": 15 },
+    { "key": "j7", "company": "Orbitfield Media", "title": "Frontend Engineer (React)", "location": "New York, NY", "posting_url": "https://example.com/jobs/orbitfield-frontend", "description": "Accessible TypeScript UI for a publishing CMS.", "notes": null, "created_days_ago": 10 },
+    { "key": "j8", "company": "Saltmarsh Energy", "title": "Software Engineer II", "location": "Portland, OR", "posting_url": "https://example.com/jobs/saltmarsh-swe2", "description": "Grid-monitoring services and APIs.", "notes": null, "created_days_ago": 6 },
+    { "key": "j9", "company": "Pinecrest Fintech", "title": "API Engineer", "location": "Remote", "posting_url": "https://example.com/jobs/pinecrest-api", "description": "Payments-adjacent REST APIs with strict validation.", "notes": "Apply after updating portfolio.", "created_days_ago": 3 },
+    { "key": "j10", "company": "Quarry Lane Studio", "title": "Junior Developer", "location": "Salt Lake City, UT", "posting_url": null, "description": null, "notes": "Heard about it at a meetup.", "created_days_ago": 1 }
+  ],
+  "applications": [
+    { "job": "j1", "status": "interviewing", "applied_days_ago": 28, "follow_up_in_days": 2, "notes": "Technical screen went well; system design round next." },
+    { "job": "j2", "status": "rejected", "applied_days_ago": 25, "follow_up_in_days": null, "notes": "Position filled internally." },
+    { "job": "j3", "status": "applied", "applied_days_ago": 20, "follow_up_in_days": 5, "notes": null },
+    { "job": "j4", "status": "offer", "applied_days_ago": 19, "follow_up_in_days": 1, "notes": "Offer received; reviewing details." },
+    { "job": "j6", "status": "applied", "applied_days_ago": 12, "follow_up_in_days": 9, "notes": null },
+    { "job": "j7", "status": "withdrawn", "applied_days_ago": 8, "follow_up_in_days": null, "notes": "Role required relocation." },
+    { "job": "j8", "status": "interviewing", "applied_days_ago": 4, "follow_up_in_days": 4, "notes": "Recruiter call scheduled." }
+  ]
+}

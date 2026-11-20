@@ -18,6 +18,7 @@ htmlcov/
 # Node
 node_modules/
 dist/
+dist-demo/
 build/
 coverage/
 
@@ -28,6 +29,8 @@ backups/
 *.sqlite3
 *.xlsx
 *.xls
+# Fictional demo sample (see frontend/scripts/demo_workbook.py); never commit real exports.
+!frontend/public/demo/sample-applications.xlsx
 
 # Editor, OS
 .DS_Store
