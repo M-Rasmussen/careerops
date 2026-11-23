@@ -1,0 +1,12 @@
+# Optional NVIDIA GPU for the local Ollama service. Without this file Ollama runs on CPU.
+#   docker compose -f compose.yaml -f compose.gpu.yaml --profile local-ai up -d ollama
+# Needs the NVIDIA driver plus GPU support in Docker (Docker Desktop + WSL2 provides it).
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
