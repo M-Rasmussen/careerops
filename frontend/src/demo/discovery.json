@@ -1,0 +1,561 @@
+{
+  "_note": "Entirely fictional discovery data: made-up employers on reserved .example domains, made-up board identifiers, example.com postings. No real job board or provider is ever contacted. Filter results, technologies, and requirement sections are prerecorded for the seeded filters.",
+  "filters": {
+    "role_families": [
+      "backend",
+      "software",
+      "fullstack",
+      "platform",
+      "devops",
+      "support",
+      "sdet"
+    ],
+    "geographies": [
+      "nj",
+      "nyc",
+      "remote_us"
+    ],
+    "title_keywords": [],
+    "excluded_keywords": [
+      "sales"
+    ],
+    "locations": [],
+    "workplace_types": [],
+    "seniority": [],
+    "min_salary": 110000,
+    "salary_currency": "USD"
+  },
+  "companies": [
+    {
+      "key": "lumen",
+      "name": "Lumen Harbor Labs",
+      "domain": "lumenharbor.example",
+      "origin": "curated_seed",
+      "watchlist": true,
+      "verification_status": "verified",
+      "engineering_focus": "Climate data APIs",
+      "target_geography": "Remote US"
+    },
+    {
+      "key": "kestrel",
+      "name": "Kestrel Data Co.",
+      "domain": "kestreldata.example",
+      "origin": "curated_seed",
+      "watchlist": false,
+      "verification_status": "verified",
+      "engineering_focus": "Analytics platform",
+      "target_geography": "Jersey City / NYC"
+    },
+    {
+      "key": "northwind",
+      "name": "Northwind Cartography",
+      "domain": "northwindcarto.example",
+      "origin": "curated_seed",
+      "watchlist": false,
+      "verification_status": "verified",
+      "engineering_focus": "Mapping services",
+      "target_geography": "NYC"
+    },
+    {
+      "key": "orbital",
+      "name": "Orbital Fern",
+      "domain": "orbitalfern.example",
+      "origin": "curated_seed",
+      "watchlist": false,
+      "verification_status": "verified",
+      "engineering_focus": null,
+      "target_geography": "Remote"
+    },
+    {
+      "key": "brightpath",
+      "name": "Brightpath Logistics",
+      "domain": "brightpath.example",
+      "origin": "manual",
+      "watchlist": true,
+      "verification_status": "verified",
+      "engineering_focus": "Fleet routing",
+      "target_geography": "Newark, NJ"
+    },
+    {
+      "key": "quill",
+      "name": "Quillfeather Health",
+      "domain": null,
+      "origin": "discovered",
+      "watchlist": false,
+      "verification_status": "provider_reported",
+      "engineering_focus": null,
+      "target_geography": null
+    },
+    {
+      "key": "saltmarsh",
+      "name": "Saltmarsh Robotics",
+      "domain": null,
+      "origin": "discovered",
+      "watchlist": false,
+      "verification_status": "unresolved",
+      "engineering_focus": null,
+      "target_geography": null
+    }
+  ],
+  "boards": [
+    {
+      "key": "lumen-gh",
+      "company": "lumen",
+      "provider": "greenhouse",
+      "board_token": "lumenharbor",
+      "verification_status": "verified",
+      "enabled": true,
+      "checked_days_ago": 1,
+      "last_error": null
+    },
+    {
+      "key": "kestrel-lever",
+      "company": "kestrel",
+      "provider": "lever",
+      "board_token": "kestreldata",
+      "verification_status": "verified",
+      "enabled": true,
+      "checked_days_ago": 1,
+      "last_error": null
+    },
+    {
+      "key": "northwind-gh",
+      "company": "northwind",
+      "provider": "greenhouse",
+      "board_token": "northwindcarto",
+      "verification_status": "verified",
+      "enabled": true,
+      "checked_days_ago": 1,
+      "last_error": "HTTP 503 (simulated)"
+    },
+    {
+      "key": "orbital-ashby",
+      "company": "orbital",
+      "provider": "ashby",
+      "board_token": "orbitalfern",
+      "verification_status": "failed",
+      "enabled": true,
+      "checked_days_ago": 4,
+      "last_error": "Not found (HTTP 404) (simulated)"
+    }
+  ],
+  "simulated_errors": {
+    "northwindcarto": "HTTP 503 (simulated)"
+  },
+  "verifiable_boards": [
+    "brightpath",
+    "quillfeather",
+    "saltmarsh"
+  ],
+  "jobs": [
+    {
+      "company": "lumen",
+      "board": "lumen-gh",
+      "provider": "greenhouse",
+      "source_posting_id": "910001",
+      "title": "Senior Platform Engineer",
+      "location": "Remote (US)",
+      "workplace_type": "remote",
+      "posting_url": "https://example.com/discovery/lumen-harbor/910001",
+      "salary": null,
+      "description": "Own the fictional deployment platform: Docker, CI, and observability.\nRequirements:\n5+ years building platform or infrastructure tooling\nPython and Terraform in production\nKubernetes on AWS\nNice to have\nExperience with Grafana and Prometheus\nBenefits\nFictional benefits.",
+      "filter_result": "unknown",
+      "filter_reasons": [
+        "Salary not stated or not comparable",
+        "Role: Platform (\"platform engineer\")",
+        "Remote, open to the US (Remote (US))"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 3,
+      "seeded": true,
+      "duplicate_of": null,
+      "posted_days_ago": 6,
+      "employment_type": "Full-time",
+      "seniority": "senior",
+      "technologies": [
+        "Python",
+        "Docker",
+        "Kubernetes",
+        "Terraform",
+        "AWS"
+      ],
+      "experience_required": [
+        "5+ years building platform or infrastructure tooling"
+      ]
+    },
+    {
+      "company": "kestrel",
+      "board": "kestrel-lever",
+      "provider": "lever",
+      "source_posting_id": "b7c1e2a0-demo-0001",
+      "title": "Backend Developer (Python)",
+      "location": "Jersey City, NJ",
+      "workplace_type": "hybrid",
+      "posting_url": "https://example.com/discovery/kestrel/backend-python",
+      "salary": [
+        125000,
+        150000
+      ],
+      "description": "FastAPI services and PostgreSQL for a fictional analytics product.\nWhat you'll need:\n3+ years of Python backend development\nSQL and PostgreSQL\nREST API design\nPreferred qualifications\nDocker and CI/CD\nAbout us\nKestrel Data Co. is a fictional company.",
+      "filter_result": "match",
+      "filter_reasons": [
+        "Role: Backend (\"backend\")",
+        "Location in New Jersey (Jersey City, NJ)",
+        "Salary up to 150,000 USD"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 3,
+      "seeded": true,
+      "duplicate_of": null,
+      "posted_days_ago": 4,
+      "employment_type": "Full-time",
+      "seniority": null,
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "PostgreSQL",
+        "Docker"
+      ],
+      "experience_required": [
+        "3+ years of Python backend development"
+      ],
+      "application_url": "https://example.com/discovery/kestrel/backend-python/apply"
+    },
+    {
+      "company": "kestrel",
+      "board": "kestrel-lever",
+      "provider": "lever",
+      "source_posting_id": "b7c1e2a0-demo-0002",
+      "title": "Sales Engineer",
+      "location": "Remote (US)",
+      "workplace_type": "remote",
+      "posting_url": "https://example.com/discovery/kestrel/sales-engineer",
+      "salary": [
+        100000,
+        130000
+      ],
+      "description": "Pre-sales demos for a fictional data platform. Comfort with SQL helps.",
+      "filter_result": "rejected",
+      "filter_reasons": [
+        "Title contains excluded keyword \"sales\""
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 3,
+      "seeded": true,
+      "duplicate_of": null,
+      "posted_days_ago": null,
+      "employment_type": "Full-time",
+      "seniority": null,
+      "technologies": [
+        "SQL"
+      ],
+      "experience_required": []
+    },
+    {
+      "company": "lumen",
+      "board": "lumen-gh",
+      "provider": "greenhouse",
+      "source_posting_id": "910002",
+      "title": "Data Engineer II",
+      "location": "Boston, MA",
+      "workplace_type": null,
+      "posting_url": "https://example.com/discovery/lumen-harbor/910002",
+      "salary": null,
+      "description": "Batch pipelines for fictional climate datasets with Python, Airflow, and Spark. 2+ years of SQL experience.",
+      "filter_result": "rejected",
+      "filter_reasons": [
+        "Location Boston, MA is outside your geographies",
+        "Engineering title outside your role families",
+        "Workplace type not stated"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 3,
+      "seeded": true,
+      "duplicate_of": null,
+      "posted_days_ago": 10,
+      "employment_type": null,
+      "seniority": "mid",
+      "technologies": [
+        "Python",
+        "Airflow",
+        "Spark",
+        "SQL"
+      ],
+      "experience_required": [
+        "2+ years of SQL experience"
+      ]
+    },
+    {
+      "company": "kestrel",
+      "board": "kestrel-lever",
+      "provider": "lever",
+      "source_posting_id": "b7c1e2a0-demo-0003",
+      "title": "SDET, Payments",
+      "location": "New York, NY",
+      "workplace_type": "onsite",
+      "posting_url": "https://example.com/discovery/kestrel/sdet",
+      "salary": [
+        95000,
+        105000
+      ],
+      "description": "Contract-to-hire test automation role for a fictional analytics product.\nRequirements:\n2+ years of test automation with Python\nSelenium or Playwright\npytest\nBenefits\nFictional benefits.",
+      "filter_result": "rejected",
+      "filter_reasons": [
+        "Salary up to 105,000 USD is below 110,000"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 2,
+      "seeded": true,
+      "duplicate_of": null,
+      "posted_days_ago": 3,
+      "employment_type": "Contract-to-hire",
+      "seniority": null,
+      "technologies": [
+        "Python",
+        "Selenium",
+        "pytest",
+        "CI/CD"
+      ],
+      "experience_required": [
+        "2+ years of test automation with Python"
+      ]
+    },
+    {
+      "company": "lumen",
+      "board": "lumen-gh",
+      "provider": "greenhouse",
+      "source_posting_id": "910003",
+      "title": "Site Reliability Engineer",
+      "location": "Remote - Americas",
+      "workplace_type": "remote",
+      "posting_url": "https://example.com/discovery/lumen-harbor/910003",
+      "salary": null,
+      "description": "On-call rotation and incident tooling for fictional services, written in Go. Kubernetes, Prometheus, and Linux.",
+      "filter_result": "unknown",
+      "filter_reasons": [
+        "Salary not stated or not comparable",
+        "Role: DevOps / infrastructure (\"site reliability\")",
+        "Remote, open to the US (Remote - Americas)"
+      ],
+      "review_status": "later",
+      "first_seen_days_ago": 2,
+      "seeded": true,
+      "duplicate_of": null,
+      "posted_days_ago": null,
+      "employment_type": "Full-time",
+      "seniority": null,
+      "technologies": [
+        "Go",
+        "Kubernetes",
+        "Prometheus",
+        "Linux"
+      ],
+      "experience_required": []
+    },
+    {
+      "company": "quill",
+      "board": null,
+      "provider": "himalayas",
+      "source_posting_id": "demo-himalayas-quill-1",
+      "title": "Full Stack Engineer",
+      "location": "Remote - United States",
+      "workplace_type": "remote",
+      "posting_url": "https://example.com/discovery/quillfeather/full-stack",
+      "salary": [
+        130000,
+        155000
+      ],
+      "description": "Patient-portal features for a fictional health company using TypeScript, React, Node.js, and PostgreSQL.",
+      "filter_result": "match",
+      "filter_reasons": [
+        "Role: Full-stack (\"full stack\")",
+        "Remote, open to the US (Remote - United States)",
+        "Salary up to 155,000 USD"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 2,
+      "seeded": true,
+      "duplicate_of": null,
+      "posted_days_ago": null,
+      "employment_type": "Full-time",
+      "seniority": "mid",
+      "technologies": [
+        "TypeScript",
+        "React",
+        "Node.js",
+        "PostgreSQL"
+      ],
+      "experience_required": []
+    },
+    {
+      "company": "saltmarsh",
+      "board": null,
+      "provider": "himalayas",
+      "source_posting_id": "demo-himalayas-salt-1",
+      "title": "Production Support Engineer",
+      "location": "Remote - Canada",
+      "workplace_type": "remote",
+      "posting_url": "https://example.com/discovery/saltmarsh/prod-support",
+      "salary": null,
+      "description": "Application support for fictional warehouse robots. Linux and SQL troubleshooting.",
+      "filter_result": "rejected",
+      "filter_reasons": [
+        "Remote, limited to Remote - Canada",
+        "Salary not stated or not comparable"
+      ],
+      "review_status": "skipped",
+      "first_seen_days_ago": 2,
+      "seeded": true,
+      "duplicate_of": null,
+      "posted_days_ago": null,
+      "employment_type": "Full-time",
+      "seniority": null,
+      "technologies": [
+        "Linux",
+        "SQL"
+      ],
+      "experience_required": []
+    },
+    {
+      "company": "lumen",
+      "board": null,
+      "provider": "himalayas",
+      "source_posting_id": "demo-himalayas-lumen-910001",
+      "title": "Senior Platform Engineer",
+      "location": "Remote - United States",
+      "workplace_type": "remote",
+      "posting_url": "https://example.com/discovery/lumen-harbor/910001",
+      "salary": null,
+      "description": "Own the fictional deployment platform: Docker, CI, and observability.",
+      "filter_result": "unknown",
+      "filter_reasons": [
+        "Salary not stated or not comparable",
+        "Role: Platform (\"platform engineer\")",
+        "Remote, open to the US (Remote - United States)"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 1,
+      "seeded": true,
+      "duplicate_of": "910001",
+      "posted_days_ago": null,
+      "employment_type": "Full-time",
+      "seniority": "senior",
+      "technologies": [
+        "Python",
+        "Docker",
+        "Kubernetes",
+        "Terraform",
+        "AWS"
+      ],
+      "experience_required": []
+    },
+    {
+      "company": "lumen",
+      "board": "lumen-gh",
+      "provider": "greenhouse",
+      "source_posting_id": "910004",
+      "title": "Backend Engineer, Forecasting",
+      "location": "Remote (US)",
+      "workplace_type": "remote",
+      "posting_url": "https://example.com/discovery/lumen-harbor/910004",
+      "salary": null,
+      "description": "Forecasting APIs for fictional climate data with Python, FastAPI, and PostgreSQL.",
+      "filter_result": "unknown",
+      "filter_reasons": [
+        "Salary not stated or not comparable",
+        "Role: Backend (\"backend\")",
+        "Remote, open to the US (Remote (US))"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 0,
+      "seeded": false,
+      "duplicate_of": null,
+      "posted_days_ago": 1,
+      "employment_type": "Full-time",
+      "seniority": null,
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "PostgreSQL"
+      ],
+      "experience_required": []
+    },
+    {
+      "company": "kestrel",
+      "board": "kestrel-lever",
+      "provider": "lever",
+      "source_posting_id": "b7c1e2a0-demo-0005",
+      "title": "Software Engineer II",
+      "location": "Jersey City, NJ",
+      "workplace_type": "hybrid",
+      "posting_url": "https://example.com/discovery/kestrel/swe-ii",
+      "salary": [
+        140000,
+        165000
+      ],
+      "description": "Core services for a fictional data platform.\nRequirements:\n3+ years of Java\nSpring Boot microservices\nKafka\nNice to have\nAWS experience",
+      "filter_result": "match",
+      "filter_reasons": [
+        "Role: Software engineering / SWE II (\"software engineer\")",
+        "Location in New Jersey (Jersey City, NJ)",
+        "Salary up to 165,000 USD"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 0,
+      "seeded": false,
+      "duplicate_of": null,
+      "posted_days_ago": 1,
+      "employment_type": "Full-time",
+      "seniority": "mid",
+      "technologies": [
+        "Java",
+        "Spring",
+        "Kafka",
+        "AWS"
+      ],
+      "experience_required": [
+        "3+ years of Java"
+      ]
+    },
+    {
+      "company": "fernwood",
+      "board": null,
+      "provider": "himalayas",
+      "source_posting_id": "demo-himalayas-fernwood-1",
+      "title": "DevOps Engineer",
+      "location": "Remote - Worldwide",
+      "workplace_type": "remote",
+      "posting_url": "https://example.com/discovery/fernwood/devops",
+      "salary": [
+        120000,
+        140000
+      ],
+      "description": "Kubernetes and Terraform for a fictional bookstore chain on AWS.",
+      "filter_result": "match",
+      "filter_reasons": [
+        "Role: DevOps / infrastructure (\"devops\")",
+        "Remote, open to the US (Remote - Worldwide)",
+        "Salary up to 140,000 USD"
+      ],
+      "review_status": "new",
+      "first_seen_days_ago": 0,
+      "seeded": false,
+      "duplicate_of": null,
+      "posted_days_ago": null,
+      "employment_type": "Contract",
+      "seniority": null,
+      "technologies": [
+        "Kubernetes",
+        "Terraform",
+        "AWS"
+      ],
+      "experience_required": []
+    }
+  ],
+  "discovered_on_run": {
+    "fernwood": {
+      "name": "Fernwood Books",
+      "verification_status": "provider_reported"
+    }
+  }
+}

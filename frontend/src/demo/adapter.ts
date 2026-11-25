@@ -1,16 +1,19 @@
 // Browser-only adapter for the public demo. It never calls the API or the real database; the only
 // network request is for its own static sample workbook. AI matching replays recorded, fictional
-// assessments: no AI provider is ever contacted.
+// assessments: no AI provider is ever contacted. Job discovery and the company directory are simulated over
+// fictional employers (see ./discovery.ts): no job board or provider is contacted.
 import type { Application, ApplicationFilters, Assessment, CandidateProfile, DataAdapter, Job, JobMatch, OverallMatch } from "../types";
 import { STATUSES } from "../types";
 import { addDays, today } from "../dates";
 import seed from "./seed.json";
 import matching from "./matching.json";
+import { discoveryMethods, seedDiscovery, type DiscoveryState } from "./discovery";
 
 const KEY = "careerops-demo-v1";
 type StoredApp = Omit<Application, "job">;
 type StoredMatch = Omit<JobMatch, "job">;
-interface State { jobs: Job[]; apps: StoredApp[]; profile: CandidateProfile; matches: StoredMatch[] }
+type Discovery = DiscoveryState;
+interface State extends Discovery { jobs: Job[]; apps: StoredApp[]; profile: CandidateProfile; matches: StoredMatch[] }
 type Recorded = (typeof matching.recorded_matches)[number];
 
 const seedJob = (r: Recorded) => seed.jobs.find((j) => j.key === r.job)!;
@@ -31,13 +34,20 @@ function replay(r: Recorded, jobId: string, at: string): StoredMatch {
 }
 
 /** Adds AI-matching seed data; also upgrades demo state saved before AI matching existed. */
-function withMatching(s: Omit<State, "profile" | "matches"> & Partial<State>): State {
+function withMatching(s: Pick<State, "jobs" | "apps"> & Partial<State>): Omit<State, keyof Discovery> & Partial<Discovery> {
   const at = `${today()}T12:00:00Z`;
   const matches = matching.recorded_matches.flatMap((r) => {
     const job = s.jobs.find((j) => recordedFor(j) === r);
     return job && r.seeded_days_ago !== null ? [replay(r, job.id, `${addDays(today(), -r.seeded_days_ago)}T12:00:00Z`)] : [];
   });
   return { profile: { resume_text: matching.profile, created_at: at, updated_at: at }, matches, ...s };
+}
+
+/** Adds discovery seed data; also replaces demo discovery state saved by an older demo version. */
+function withDiscovery(s: Omit<State, keyof Discovery> & Partial<Discovery>): State {
+  if (s.discovered?.every((d) => "review_history" in d && "experience_required" in d && "application_url" in d) &&
+      s.companies?.every((c) => "discovery_status" in c) && s.runs?.every((r) => "tasks_total" in r)) return s as State;
+  return { ...s, ...seedDiscovery() };
 }
 
 function seedState(): State {
@@ -63,13 +73,13 @@ function seedState(): State {
       updated_at: `${applied}T12:00:00Z`,
     };
   });
-  return withMatching({ jobs, apps });
+  return withDiscovery(withMatching({ jobs, apps }));
 }
 
 function load(): State {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return withMatching(JSON.parse(raw) as State);
+    if (raw) return withDiscovery(withMatching(JSON.parse(raw) as State));
   } catch {
     // Unavailable or corrupt storage: fall back to fresh seed data.
   }
@@ -120,7 +130,8 @@ export function createDemoAdapter(sampleWorkbookUrl = "/demo/sample-applications
   return {
     mode: "demo",
     async listJobs(limit, offset) {
-      return [...state.jobs].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(offset, offset + limit);
+      // Unsaved jobs are kept (for discovery links and history) but hidden from Saved Jobs, like the API.
+      return state.jobs.filter((j) => !j.unsaved_at).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(offset, offset + limit);
     },
     async createJob(p) {
       const company = clean(p.company);
@@ -204,6 +215,10 @@ export function createDemoAdapter(sampleWorkbookUrl = "/demo/sample-applications
         .slice(offset, offset + limit)
         .map((m) => ({ ...m, job: state.jobs.find((j) => j.id === m.job_id)! }));
     },
+    ...discoveryMethods(() => state, (patch) => {
+      state = { ...state, ...patch };
+      commit();
+    }),
     async exportApplications() {
       // shortcut: static pre-generated workbook (ignores filters and demo edits); generate in-browser if it matters.
       const res = await fetch(sampleWorkbookUrl);

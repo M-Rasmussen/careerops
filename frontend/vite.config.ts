@@ -14,5 +14,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
+    // Lets the responsive-layout test read the real stylesheet (CSS is otherwise stubbed out in tests).
+    css: { include: [/styles\.css/] },
   },
 });

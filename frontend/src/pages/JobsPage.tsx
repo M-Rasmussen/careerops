@@ -15,10 +15,25 @@ export function JobsPage() {
   const [appliedFilter, setAppliedFilter] = useState<"all" | "open" | "applied">("all");
   const [params] = useSearchParams();
   const [showForm, setShowForm] = useState(params.has("add")); // Dashboard "Add job" links here with ?add=1.
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [removed, setRemoved] = useState<string | null>(null);
   const { data: result, error, loading, reload } = useAsync(
     () => Promise.all([fetchAll(data.listJobs), fetchAll((l, o) => data.listApplications({}, l, o))]),
     [data],
   );
+
+  async function unsave(id: string, title: string) {
+    if (!window.confirm(`Remove “${title}” from Saved Jobs? Nothing is deleted, and you can save it again later.`)) return;
+    setActionError(null);
+    setRemoved(null);
+    try {
+      await data.unsaveJob(id);
+      setRemoved(title);
+      reload();
+    } catch (e) {
+      setActionError((e as Error).message);
+    }
+  }
 
   const appByJob = new Map(result?.[1].map((a) => [a.job_id, a]));
   const q = search.trim().toLowerCase();
@@ -42,6 +57,12 @@ export function JobsPage() {
       </div>
 
       {showForm && <JobForm onCreated={() => { setShowForm(false); reload(); }} />}
+      {actionError && <ErrorBox message={actionError} />}
+      {removed && (
+        <p className="notice" role="status">
+          Removed “{removed}” from Saved Jobs. It's still in <Link to="/discovery?saved_state=unsaved&review_status=all">Job discovery</Link> if it came from there, and you can save it again.
+        </p>
+      )}
 
       <div className="toolbar" role="search">
         <label>
@@ -73,7 +94,7 @@ export function JobsPage() {
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th scope="col">Company</th><th scope="col">Title</th><th scope="col">Location</th><th scope="col">Saved</th><th scope="col">Posting</th><th scope="col">Application</th></tr>
+                <tr><th scope="col">Company</th><th scope="col">Title</th><th scope="col">Location</th><th scope="col">Saved</th><th scope="col">Posting</th><th scope="col">Application</th><th scope="col"><span className="sr-only">Actions</span></th></tr>
               </thead>
               <tbody>
                 {jobs.map((j) => {
@@ -90,6 +111,13 @@ export function JobsPage() {
                           <Link className="btn btn-small" to={`/applications?record=${j.id}`}>
                             Record application<span className="sr-only"> for {j.title} at {j.company}</span>
                           </Link>
+                        )}
+                      </td>
+                      <td className="row-actions">
+                        {app ? <span className="muted small">Has an application</span> : (
+                          <button type="button" className="btn btn-small btn-danger" onClick={() => unsave(j.id, j.title)}>
+                            Remove from saved<span className="sr-only"> {j.title} at {j.company}</span>
+                          </button>
                         )}
                       </td>
                     </tr>

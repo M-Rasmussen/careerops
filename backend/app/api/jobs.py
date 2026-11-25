@@ -15,7 +15,7 @@ def create_job(payload: JobCreate, session: Session = Depends(get_db)) -> JobRea
     return JobRead.model_validate(job_service.create_job(session, payload))
 
 
-@router.get("", response_model=list[JobRead])
+@router.get("", response_model=list[JobRead], description="Active saved jobs (unsaved jobs are excluded).")
 def list_jobs(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
@@ -30,3 +30,17 @@ def get_job(job_id: uuid.UUID, session: Session = Depends(get_db)) -> JobRead:
     if job is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
     return JobRead.model_validate(job)
+
+
+@router.post("/{job_id}/unsave", response_model=JobRead)
+def unsave_job(job_id: uuid.UUID, session: Session = Depends(get_db)) -> JobRead:
+    """Remove from Saved Jobs (not a delete). Idempotent. 409 if an application is recorded for the job."""
+    try:
+        return JobRead.model_validate(job_service.unsave_job(session, job_id))
+    except job_service.JobNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found") from None
+    except job_service.HasApplicationError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This job has a recorded application, so it stays in your tracker. Manage it on the Applications page.",
+        ) from None

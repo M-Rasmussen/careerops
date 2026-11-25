@@ -5,7 +5,7 @@ CareerOps is a local-first, Dockerized job-application tracker that will progres
 
 ## Read first
 - `docs/PROJECT_SPEC.md`: goals, scope, architecture, invariants, data model, roadmap.
-- `docs/PHASE_01_PROMPT.md`: the **current** implementation task. Do not silently implement later phases.
+- `docs/PHASE_01_PROMPT.md`: the original Phase 1 task (completed). The current state is under "Current milestone" below; do not silently implement later phases.
 
 ## Stack and architecture
 - Backend: Python 3.12+, FastAPI, Pydantic, SQLAlchemy 2, Alembic, psycopg.
@@ -38,7 +38,19 @@ CareerOps is a local-first, Dockerized job-application tracker that will progres
 - Ask before adding any paid service or broadening scope materially.
 
 ## Current milestone
-Phase 1 is **only** a runnable FastAPI + PostgreSQL foundation with Docker Compose, a health check, the first relational migration, minimal job APIs, and persistence verification. Do not implement AI, scheduled searches, Incident Monitor connectivity, authentication, full frontend, or demo hosting in Phase 1.
+Phases 1–4B are complete: tracker foundation, applications and Excel export, React dashboard with offline demo, optional AI job matching (local Ollama or an OpenAI-compatible provider), and **Phase 4B employer-sourced job discovery** (migrations up to 0012).
+
+Phase 4B, as built:
+- Job discovery imports postings from employers' own ATS boards (Greenhouse, Lever, Lever EU, Ashby) through their official public APIs. A board is imported only after **ownership** is verified: the employer's official site (verified domain or a user-approved careers domain) names it, or the user confirmed it, and the provider's own board name / JSON-LD hiring organization doesn't contradict it.
+- Company registry (curated seed + manual + discovered), career-source discovery (homepage → careers page → own scripts, JSON-LD, sitemap; bounded standard and per-company deep scans; SSRF-safe pinned fetches; robots.txt honoured), unsupported platforms recorded (Workday, iCIMS, Oracle, Phenom, Eightfold…), domain/careers-domain changes only on user approval, evidence-based company merges.
+- Discovery generations (archive without deleting), deduplication across sources, non-vacancy exclusion (interest forms / talent pools), board roles (general vs talent pool), closed-posting tracking (2 complete syncs + 12 h), Save / Pass / Later / Restore / Unsave (never creates or changes applications).
+- Background sync worker in the API process over a PostgreSQL task queue: every eligible board synced on Run discovery and every 24 h (configurable, can be disabled), fair overdue-first order, backoff, per-host rate limits, SKIP LOCKED claiming, restart recovery.
+- Himalayas and JSearch remain optional and off by default.
+
+Known limitations / not started:
+- **Workday ingestion is not implemented.** A sitemap + schema.org JobPosting approach looks technically feasible, but the applicable terms and permission for automated retrieval must be clarified first. Embark's Workday board is recorded (ownership verified) with ingestion disabled.
+- iCIMS, Oracle Recruiting, Phenom, Eightfold and similar platforms are recorded but not supported; companies with no verified domain need one entered manually (no search provider).
+- Do not implement AI resume generation, cover letters, application preparation, the Application Workspace, or automatic application submission without an explicit new phase.
 
 ## Workflow with Claude Code / Ponytail / Graphify
 - For multi-file work, propose a concise plan, then implement only the accepted phase.
