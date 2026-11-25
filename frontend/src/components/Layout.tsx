@@ -17,6 +17,8 @@ export function Layout() {
         <div className="brand">CareerOps</div>
         <nav aria-label="Main">
           <NavLink to="/" end>Dashboard</NavLink>
+          <NavLink to="/discovery">Job discovery</NavLink>
+          <NavLink to="/companies">Company directory</NavLink>
           <NavLink to="/jobs">Saved jobs</NavLink>
           <NavLink to="/applications">Applications</NavLink>
           <NavLink to="/matching">AI matching</NavLink>

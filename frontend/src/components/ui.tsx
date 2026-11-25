@@ -33,10 +33,31 @@ export function Empty({ children, action }: { children: ReactNode; action?: Reac
   );
 }
 
-/** External job-posting link; noopener stops the new tab from reaching back into this page. */
+/** Returns the URL only if it is a well-formed http(s) URL; anything else (javascript:, data:, junk) is null. */
+export function safeExternalUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+/** External link in a new tab; noopener/noreferrer stop the new tab from reaching back into this page. */
+export function ExternalLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      {children}<span className="sr-only"> (opens in new tab)</span>
+    </a>
+  );
+}
+
+/** External job-posting link. */
 export function PostingLink({ url }: { url: string | null }) {
-  if (!url) return <span className="muted">No link</span>;
-  return <a href={url} target="_blank" rel="noopener noreferrer">Open posting<span className="sr-only"> (opens in new tab)</span></a>;
+  const safe = safeExternalUrl(url);
+  if (!safe) return <span className="muted">No link</span>;
+  return <ExternalLink href={safe}>Open posting</ExternalLink>;
 }
 
 export function saveBlob(blob: Blob, filename: string): void {

@@ -88,3 +88,50 @@ def get_ai_settings() -> AISettings:
         timeout_seconds=_int_env("AI_TIMEOUT_SECONDS", 60),
         max_runs_per_day=_int_env("AI_MAX_RUNS_PER_DAY", 20, minimum=0),
     )
+
+
+def _bool_env(name: str, default: bool) -> bool:
+    value = os.environ.get(name, "").strip().lower()
+    return default if not value else value in ("1", "true", "yes", "on")
+
+
+@dataclass(frozen=True)
+class DiscoverySettingsEnv:
+    """Discovery provider switches and request budgets. JSearch is off unless explicitly enabled with a key."""
+
+    himalayas_enabled: bool = False  # employer ATS boards are the primary source
+    himalayas_max_pages: int = 1  # pages per role-family query
+    jsearch_enabled: bool = False
+    jsearch_api_key: str = field(default="", repr=False)  # server-side only; never returned by the API
+    jsearch_monthly_limit: int = 100  # every attempt, including retries, counts
+    jsearch_max_requests_per_run: int = 5
+    jsearch_cache_hours: int = 24  # a query fetched more recently than this is not re-requested
+    # Board synchronization (background worker in the API process; PostgreSQL task queue).
+    worker_enabled: bool = True  # processes queued runs; off = runs stay queued
+    auto_sync_enabled: bool = True  # scheduler: queue boards whose next sync is due
+    sync_interval_hours: int = 24
+    sync_concurrency: int = 2  # boards fetched at the same time (each provider host still rate-limited)
+    min_resync_minutes: int = 60  # Run discovery skips boards synced more recently (reported as deferred)
+    max_verifications_per_run: int = 5
+
+    @property
+    def jsearch_configured(self) -> bool:
+        return self.jsearch_enabled and bool(self.jsearch_api_key)
+
+
+def get_discovery_env() -> DiscoverySettingsEnv:
+    return DiscoverySettingsEnv(
+        himalayas_enabled=_bool_env("DISCOVERY_HIMALAYAS_ENABLED", False),
+        himalayas_max_pages=_int_env("DISCOVERY_HIMALAYAS_MAX_PAGES", 1),
+        jsearch_enabled=_bool_env("JSEARCH_ENABLED", False),
+        jsearch_api_key=os.environ.get("JSEARCH_API_KEY", "").strip(),
+        jsearch_monthly_limit=_int_env("JSEARCH_MONTHLY_REQUEST_LIMIT", 100, minimum=0),
+        jsearch_max_requests_per_run=_int_env("JSEARCH_MAX_REQUESTS_PER_RUN", 5, minimum=0),
+        jsearch_cache_hours=_int_env("JSEARCH_CACHE_HOURS", 24, minimum=0),
+        worker_enabled=_bool_env("DISCOVERY_WORKER_ENABLED", True),
+        auto_sync_enabled=_bool_env("DISCOVERY_AUTO_SYNC_ENABLED", True),
+        sync_interval_hours=_int_env("DISCOVERY_SYNC_INTERVAL_HOURS", 24),
+        sync_concurrency=_int_env("DISCOVERY_SYNC_CONCURRENCY", 2),
+        min_resync_minutes=_int_env("DISCOVERY_MIN_RESYNC_MINUTES", 60, minimum=0),
+        max_verifications_per_run=_int_env("DISCOVERY_MAX_VERIFICATIONS_PER_RUN", 5, minimum=0),
+    )
